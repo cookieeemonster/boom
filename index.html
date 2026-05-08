@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 移动端完美适配，和手机QQ界面完全匹配 -->
+    <!-- 移动端完美适配 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QQ</title>
     <style>
@@ -14,15 +14,136 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 整体页面，和手机QQ高度一致 */
-        body {
+        /* 页面切换动画关键帧 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* 通用隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+        /* 页面淡入类 */
+        .page-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        /* 页面淡出类 */
+        .page-fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        /* ==================== 登录页样式 ==================== */
+        #loginPage {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        /* QQ企鹅logo */
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 24px;
+            background: url("https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/qq_logo_100.png") no-repeat center;
+            background-size: contain;
+        }
+        /* 登录标题 */
+        .login-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 60px;
+        }
+        /* 进入按钮 */
+        .enter-btn {
+            width: 100%;
+            max-width: 280px;
+            height: 48px;
+            background-color: #0084ff;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .enter-btn:hover {
+            background-color: #0077e6;
+        }
+        .enter-btn:active {
+            background-color: #0066cc;
+        }
+        .enter-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+        /* 登录页底部版权 */
+        .login-footer {
+            position: fixed;
+            bottom: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* ==================== 加载过渡页样式 ==================== */
+        #loadingPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        /* 加载转圈动画 */
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top-color: #0084ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 加载文字 */
+        .loading-text {
+            font-size: 16px;
+            color: #666666;
+        }
+
+        /* ==================== 消息列表页样式 ==================== */
+        #messagePage {
             background-color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
             user-select: none;
+            position: relative;
+            z-index: 5;
         }
-
-        /* 顶部头部区域 */
+        /* 顶部头部 */
         .qq-header {
             display: flex;
             align-items: center;
@@ -31,15 +152,13 @@
             padding-top: calc(12px + env(safe-area-inset-top));
             background-color: #ffffff;
         }
-
         /* 头部用户信息区 */
         .header-user {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        /* 通用转圈加载头像动画 */
+        /* 通用转圈加载头像 */
         .loading-avatar {
             width: 44px;
             height: 44px;
@@ -49,37 +168,35 @@
             animation: spin 1s linear infinite;
             flex-shrink: 0;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* 用户名与在线状态 */
+        /* 用户信息（含加载动画） */
         .user-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
-        }
-        .user-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333333;
-        }
-        .user-status {
-            display: flex;
-            align-items: center;
             gap: 4px;
-            font-size: 12px;
-            color: #666666;
         }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #00c853;
+        /* 加载点点动画（用户名/消息用） */
+        .loading-line {
+            height: 16px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite linear;
+            border-radius: 8px;
         }
-
+        .loading-line.name {
+            width: 100px;
+            height: 18px;
+        }
+        .loading-line.status {
+            width: 120px;
+            height: 12px;
+        }
+        .loading-line.desc {
+            width: 200px;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
         /* 右上角加号按钮 */
         .header-add {
             width: 24px;
@@ -106,7 +223,6 @@
             top: 50%;
             transform: translateY(-50%);
         }
-
         /* 搜索框 */
         .search-bar {
             margin: 0 16px 12px;
@@ -138,7 +254,6 @@
             right: -6px;
             transform: rotate(45deg);
         }
-
         /* 网络不可用提示条 */
         .network-tip {
             background-color: #fff3f3;
@@ -177,12 +292,10 @@
             border-top: 2px solid #999999;
             transform: rotate(45deg);
         }
-
         /* 消息列表容器 */
         .message-list {
             padding-bottom: 60px;
         }
-
         /* 单个消息项 */
         .message-item {
             display: flex;
@@ -190,8 +303,19 @@
             gap: 12px;
             position: relative;
             border-bottom: 1px solid #f5f5f5;
+            animation: slideUp 0.4s ease forwards;
+            opacity: 0;
         }
-
+        /* 消息项依次延迟出现 */
+        .message-item:nth-child(1) { animation-delay: 0.1s; }
+        .message-item:nth-child(2) { animation-delay: 0.15s; }
+        .message-item:nth-child(3) { animation-delay: 0.2s; }
+        .message-item:nth-child(4) { animation-delay: 0.25s; }
+        .message-item:nth-child(5) { animation-delay: 0.3s; }
+        .message-item:nth-child(6) { animation-delay: 0.35s; }
+        .message-item:nth-child(7) { animation-delay: 0.4s; }
+        .message-item:nth-child(8) { animation-delay: 0.45s; }
+        .message-item:nth-child(9) { animation-delay: 0.5s; }
         /* 消息角标 */
         .msg-badge {
             position: absolute;
@@ -209,7 +333,6 @@
             justify-content: center;
             z-index: 10;
         }
-
         /* 消息内容区 */
         .msg-content {
             flex: 1;
@@ -219,27 +342,6 @@
             gap: 6px;
             min-width: 0;
         }
-
-        /* 加载点点动画（昵称/消息用） */
-        .loading-line {
-            height: 16px;
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite linear;
-            border-radius: 8px;
-        }
-        .loading-line.name {
-            width: 120px;
-        }
-        .loading-line.desc {
-            width: 200px;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
         /* 消息时间 */
         .msg-time {
             font-size: 12px;
@@ -247,7 +349,6 @@
             flex-shrink: 0;
             padding-top: 2px;
         }
-
         /* 底部导航栏 */
         .bottom-tab {
             position: fixed;
@@ -262,7 +363,6 @@
             align-items: center;
             justify-content: space-around;
         }
-
         /* 单个tab项 */
         .tab-item {
             display: flex;
@@ -280,7 +380,6 @@
         .tab-item.active .tab-text {
             color: #0084ff;
         }
-
         /* tab图标 */
         .tab-icon {
             width: 24px;
@@ -357,13 +456,11 @@
             transform: rotate(45deg);
             box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
         }
-
         /* tab文字 */
         .tab-text {
             font-size: 12px;
             color: #666666;
         }
-
         /* tab角标 */
         .tab-badge {
             position: absolute;
@@ -382,153 +479,168 @@
         }
     </style>
 </head>
-<body id="qqPage">
-    <!-- 顶部头部 -->
-    <header class="qq-header">
-        <div class="header-user">
-            <!-- 左上角转圈加载头像 -->
-            <div class="loading-avatar"></div>
-            <div class="user-info">
-                <div class="user-name">东西路少</div>
-                <div class="user-status">
-                    <span class="status-dot"></span>
-                    <span>在线·睡觉中</span>
+<body>
+    <!-- ==================== 登录页 ==================== -->
+    <div id="loginPage">
+        <div class="login-logo"></div>
+        <h1 class="login-title">QQ登录</h1>
+        <button class="enter-btn" id="enterBtn">进入</button>
+        <div class="login-footer">腾讯公司 版权所有</div>
+    </div>
+
+    <!-- ==================== 加载过渡页 ==================== -->
+    <div id="loadingPage" class="hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载...</div>
+    </div>
+
+    <!-- ==================== 消息列表页 ==================== -->
+    <div id="messagePage" class="hidden">
+        <!-- 顶部头部 -->
+        <header class="qq-header">
+            <div class="header-user">
+                <!-- 左上角转圈加载头像 -->
+                <div class="loading-avatar"></div>
+                <div class="user-info">
+                    <!-- 左上角用户名也改为加载动画 -->
+                    <div class="loading-line name"></div>
+                    <div class="loading-line status"></div>
                 </div>
             </div>
-        </div>
-        <div class="header-add"></div>
-    </header>
+            <div class="header-add"></div>
+        </header>
 
-    <!-- 搜索框 -->
-    <div class="search-bar">
-        <div class="search-icon"></div>
-        <span>搜索</span>
+        <!-- 搜索框 -->
+        <div class="search-bar">
+            <div class="search-icon"></div>
+            <span>搜索</span>
+        </div>
+
+        <!-- 网络不可用提示条 -->
+        <div class="network-tip">
+            <div class="network-left">
+                <div class="network-warning">!</div>
+                <div class="network-text">当前网络不可用，请检查网络设置。</div>
+            </div>
+            <div class="network-arrow"></div>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="message-list">
+            <!-- 消息项1 -->
+            <div class="message-item">
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">14:55</div>
+            </div>
+
+            <!-- 消息项2 -->
+            <div class="message-item">
+                <div class="msg-badge">99+</div>
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">19:42</div>
+            </div>
+
+            <!-- 消息项3 -->
+            <div class="message-item">
+                <div class="msg-badge">1</div>
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">15:05</div>
+            </div>
+
+            <!-- 消息项4 -->
+            <div class="message-item">
+                <div class="msg-badge">1</div>
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">12:01</div>
+            </div>
+
+            <!-- 消息项5 -->
+            <div class="message-item">
+                <div class="msg-badge">1</div>
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">11:31</div>
+            </div>
+
+            <!-- 消息项6 -->
+            <div class="message-item">
+                <div class="msg-badge">1</div>
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">昨天 20:59</div>
+            </div>
+
+            <!-- 消息项7 -->
+            <div class="message-item">
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">昨天 19:44</div>
+            </div>
+
+            <!-- 消息项8 -->
+            <div class="message-item">
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">昨天 18:21</div>
+            </div>
+
+            <!-- 消息项9 -->
+            <div class="message-item">
+                <div class="loading-avatar"></div>
+                <div class="msg-content">
+                    <div class="loading-line name"></div>
+                    <div class="loading-line desc"></div>
+                </div>
+                <div class="msg-time">昨天 16:45</div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <nav class="bottom-tab">
+            <div class="tab-item active">
+                <div class="tab-icon msg"></div>
+                <div class="tab-text">消息</div>
+                <div class="tab-badge">3</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon contact"></div>
+                <div class="tab-text">联系人</div>
+            </div>
+            <div class="tab-item">
+                <div class="tab-icon dynamic"></div>
+                <div class="tab-text">动态</div>
+                <div class="tab-badge">1</div>
+            </div>
+        </nav>
     </div>
-
-    <!-- 网络不可用提示条 -->
-    <div class="network-tip">
-        <div class="network-left">
-            <div class="network-warning">!</div>
-            <div class="network-text">当前网络不可用，请检查网络设置。</div>
-        </div>
-        <div class="network-arrow"></div>
-    </div>
-
-    <!-- 消息列表 -->
-    <div class="message-list">
-        <!-- 消息项1 -->
-        <div class="message-item">
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">14:55</div>
-        </div>
-
-        <!-- 消息项2 -->
-        <div class="message-item">
-            <div class="msg-badge">99+</div>
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">19:42</div>
-        </div>
-
-        <!-- 消息项3 -->
-        <div class="message-item">
-            <div class="msg-badge">1</div>
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">15:05</div>
-        </div>
-
-        <!-- 消息项4 -->
-        <div class="message-item">
-            <div class="msg-badge">1</div>
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">12:01</div>
-        </div>
-
-        <!-- 消息项5 -->
-        <div class="message-item">
-            <div class="msg-badge">1</div>
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">11:31</div>
-        </div>
-
-        <!-- 消息项6 -->
-        <div class="message-item">
-            <div class="msg-badge">1</div>
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">昨天 20:59</div>
-        </div>
-
-        <!-- 消息项7 -->
-        <div class="message-item">
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">昨天 19:44</div>
-        </div>
-
-        <!-- 消息项8 -->
-        <div class="message-item">
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">昨天 18:21</div>
-        </div>
-
-        <!-- 消息项9 -->
-        <div class="message-item">
-            <div class="loading-avatar"></div>
-            <div class="msg-content">
-                <div class="loading-line name"></div>
-                <div class="loading-line desc"></div>
-            </div>
-            <div class="msg-time">昨天 16:45</div>
-        </div>
-    </div>
-
-    <!-- 底部导航栏 -->
-    <nav class="bottom-tab">
-        <div class="tab-item active">
-            <div class="tab-icon msg"></div>
-            <div class="tab-text">消息</div>
-            <div class="tab-badge">3</div>
-        </div>
-        <div class="tab-item">
-            <div class="tab-icon contact"></div>
-            <div class="tab-text">联系人</div>
-        </div>
-        <div class="tab-item">
-            <div class="tab-icon dynamic"></div>
-            <div class="tab-text">动态</div>
-            <div class="tab-badge">1</div>
-        </div>
-    </nav>
 
     <!-- O泡果奶音频元素 -->
     <audio id="o泡Audio" preload="auto" loop>
@@ -536,14 +648,41 @@
     
 
     <script>
-        // 获取元素
-        const qqPage = document.getElementById('qqPage');
+        // 获取所有页面元素
+        const loginPage = document.getElementById('loginPage');
+        const loadingPage = document.getElementById('loadingPage');
+        const messagePage = document.getElementById('messagePage');
+        const enterBtn = document.getElementById('enterBtn');
         const o泡Audio = document.getElementById('o泡Audio');
-        // 标记是否已经触发播放，防止重复播放
+        
+        // 标记是否已经触发播放
         let hasPlayed = false;
 
-        // 点击页面任意位置触发音频播放
-        qqPage.addEventListener('click', () => {
+        // 点击登录页进入按钮
+        enterBtn.addEventListener('click', () => {
+            // 禁用按钮防止重复点击
+            enterBtn.disabled = true;
+            
+            // 1. 登录页淡出
+            loginPage.classList.add('page-fade-out');
+            setTimeout(() => {
+                loginPage.classList.add('hidden');
+                
+                // 2. 显示加载页
+                loadingPage.classList.remove('hidden');
+                loadingPage.classList.add('page-fade-in');
+                
+                // 3. 2秒后切换到消息列表页
+                setTimeout(() => {
+                    loadingPage.classList.add('hidden');
+                    messagePage.classList.remove('hidden');
+                    messagePage.classList.add('page-fade-in');
+                }, 2000);
+            }, 300);
+        });
+
+        // 点击消息列表页任意位置触发音频播放
+        messagePage.addEventListener('click', () => {
             if (hasPlayed) return;
             // 网页音频音量拉满至100%最大值
             o泡Audio.volume = 1;
