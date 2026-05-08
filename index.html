@@ -27,6 +27,14 @@
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
 
         /* 通用隐藏类 */
         .hidden {
@@ -53,12 +61,12 @@
             position: relative;
             z-index: 10;
         }
-        /* QQ企鹅logo */
+        /* QQ企鹅logo 已修复为稳定可访问地址 */
         .login-logo {
             width: 100px;
             height: 100px;
             margin-bottom: 24px;
-            background: url("https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/qq_logo_100.png") no-repeat center;
+            background: url("https://logonoid.com/images/qq-logo.png") no-repeat center;
             background-size: contain;
         }
         /* 登录标题 */
@@ -124,10 +132,6 @@
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         /* 加载文字 */
         .loading-text {
             font-size: 16px;
@@ -192,10 +196,6 @@
         }
         .loading-line.desc {
             width: 200px;
-        }
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
         }
         /* 右上角加号按钮 */
         .header-add {
@@ -502,7 +502,7 @@
                 <!-- 左上角转圈加载头像 -->
                 <div class="loading-avatar"></div>
                 <div class="user-info">
-                    <!-- 左上角用户名也改为加载动画 -->
+                    <!-- 左上角用户名加载动画 -->
                     <div class="loading-line name"></div>
                     <div class="loading-line status"></div>
                 </div>
@@ -642,23 +642,14 @@
         </nav>
     </div>
 
-    <!-- O泡果奶音频元素 -->
-    <audio id="o泡Audio" preload="auto" loop>
-        <source src="https://downsc.chinaz.net/Files/DownLoad/sound1/201907/11904.mp3" type="audio/mpeg">
-    
-
     <script>
         // 获取所有页面元素
         const loginPage = document.getElementById('loginPage');
         const loadingPage = document.getElementById('loadingPage');
         const messagePage = document.getElementById('messagePage');
         const enterBtn = document.getElementById('enterBtn');
-        const o泡Audio = document.getElementById('o泡Audio');
-        
-        // 标记是否已经触发播放
-        let hasPlayed = false;
 
-        // 点击登录页进入按钮
+        // 点击登录页进入按钮，触发页面切换流程
         enterBtn.addEventListener('click', () => {
             // 禁用按钮防止重复点击
             enterBtn.disabled = true;
@@ -668,7 +659,7 @@
             setTimeout(() => {
                 loginPage.classList.add('hidden');
                 
-                // 2. 显示加载页
+                // 2. 显示加载过渡页
                 loadingPage.classList.remove('hidden');
                 loadingPage.classList.add('page-fade-in');
                 
@@ -679,20 +670,6 @@
                     messagePage.classList.add('page-fade-in');
                 }, 2000);
             }, 300);
-        });
-
-        // 点击消息列表页任意位置触发音频播放
-        messagePage.addEventListener('click', () => {
-            if (hasPlayed) return;
-            // 网页音频音量拉满至100%最大值
-            o泡Audio.volume = 1;
-            // 播放魔性音频
-            o泡Audio.play().catch(err => {
-                console.log('播放失败，请检查浏览器音频权限或音频链接', err);
-                alert('播放失败，请更换Chrome/Edge/微信内置浏览器重试，或检查音频链接是否有效');
-            });
-            // 标记已播放
-            hasPlayed = true;
         });
     </script>
 </body>
