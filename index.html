@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端适配 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QQ登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        /* 仿QQ登录页整体背景 */
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* QQ logo区域 */
+        .qq-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            background: url("https://qzonestyle.gtimg.cn/qzone/v8/img/Qzone.svg") no-repeat center;
+            background-size: contain;
+        }
+
+        /* 登录标题 */
+        .login-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 60px;
+        }
+
+        /* 核心进入按钮 仿QQ登录按钮样式 */
+        .enter-btn {
+            width: 100%;
+            max-width: 280px;
+            height: 48px;
+            background-color: #0084ff;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .enter-btn:hover {
+            background-color: #0077e6;
+        }
+
+        .enter-btn:active {
+            background-color: #0066cc;
+        }
+
+        /* 底部版权文字 仿QQ登录页底部 */
+        .footer-text {
+            position: fixed;
+            bottom: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 恶搞提示 点击后显示 */
+        .prank-tip {
+            margin-top: 30px;
+            font-size: 16px;
+            color: #ff4444;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .prank-tip.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- QQ logo -->
+    <div class="qq-logo"></div>
+    <!-- 登录标题 -->
+    <h1 class="login-title">QQ登录</h1>
+    <!-- 核心进入按钮 -->
+    <button class="enter-btn" id="enterBtn">进入</button>
+    <!-- 恶搞提示 -->
+    <div class="prank-tip" id="prankTip">恭喜你中招啦~</div>
+    <!-- 底部版权文字 -->
+    <div class="footer-text">腾讯公司 版权所有</div>
+
+    <!-- 音频元素 O泡果奶魔性音乐 -->
+    <audio id="o泡Audio" preload="auto">
+        <!-- 音频链接可自行替换，当前为公开可访问的O泡果奶广告曲 -->
+        <source src="https://downsc.chinaz.net/Files/DownLoad/sound1/201907/11904.mp3" type="audio/mpeg">
+    
+
+    <script>
+        // 获取元素
+        const enterBtn = document.getElementById('enterBtn');
+        const o泡Audio = document.getElementById('o泡Audio');
+        const prankTip = document.getElementById('prankTip');
+
+        // 点击按钮触发事件
+        enterBtn.addEventListener('click', () => {
+            // 将音频音量设置为最大值（100%）
+            o泡Audio.volume = 1;
+            // 播放音频
+            o泡Audio.play().catch(err => {
+                console.log('播放失败，请检查浏览器音频权限或音频链接', err);
+                alert('播放失败，请更换浏览器重试，或检查音频链接是否有效');
+            });
+            // 显示恶搞提示
+            prankTip.classList.add('show');
+            // 禁用按钮防止重复点击
+            enterBtn.disabled = true;
+            enterBtn.style.backgroundColor = '#999';
+        });
+    </script>
+</body>
+</html>
