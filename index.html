@@ -2,134 +2,558 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 移动端完美适配 -->
+    <!-- 移动端完美适配，和手机QQ界面完全匹配 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>QQ登录</title>
+    <title>QQ</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 仿QQ登录页整体背景 */
+        /* 整体页面，和手机QQ高度一致 */
         body {
-            background-color: #f5f5f5;
+            background-color: #ffffff;
             min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* 顶部头部区域 */
+        .qq-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            padding-top: calc(12px + env(safe-area-inset-top));
+            background-color: #ffffff;
+        }
+
+        /* 头部用户信息区 */
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 通用转圈加载头像动画 */
+        .loading-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid #f0f0f0;
+            border-top-color: #0084ff;
+            animation: spin 1s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 用户名与在线状态 */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #666666;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #00c853;
+        }
+
+        /* 右上角加号按钮 */
+        .header-add {
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+        .header-add::before, .header-add::after {
+            content: '';
+            position: absolute;
+            background-color: #333333;
+            border-radius: 2px;
+        }
+        .header-add::before {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+        .header-add::after {
+            width: 100%;
+            height: 2px;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* 搜索框 */
+        .search-bar {
+            margin: 0 16px 12px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #999999;
+            font-size: 16px;
+        }
+        .search-icon {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #999999;
+            border-radius: 50%;
+            position: relative;
+        }
+        .search-icon::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 2px;
+            background-color: #999999;
+            border-radius: 1px;
+            bottom: -4px;
+            right: -6px;
+            transform: rotate(45deg);
+        }
+
+        /* 网络不可用提示条 */
+        .network-tip {
+            background-color: #fff3f3;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .network-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .network-warning {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff4444;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .network-text {
+            font-size: 15px;
+            color: #333333;
+        }
+        .network-arrow {
+            width: 12px;
+            height: 12px;
+            border-right: 2px solid #999999;
+            border-top: 2px solid #999999;
+            transform: rotate(45deg);
+        }
+
+        /* 消息列表容器 */
+        .message-list {
+            padding-bottom: 60px;
+        }
+
+        /* 单个消息项 */
+        .message-item {
+            display: flex;
+            padding: 12px 16px;
+            gap: 12px;
+            position: relative;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        /* 消息角标 */
+        .msg-badge {
+            position: absolute;
+            top: 10px;
+            left: 44px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background-color: #ff4444;
+            color: #ffffff;
+            font-size: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* 消息内容区 */
+        .msg-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        /* 加载点点动画（昵称/消息用） */
+        .loading-line {
+            height: 16px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite linear;
+            border-radius: 8px;
+        }
+        .loading-line.name {
+            width: 120px;
+        }
+        .loading-line.desc {
+            width: 200px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* 消息时间 */
+        .msg-time {
+            font-size: 12px;
+            color: #999999;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        /* 底部导航栏 */
+        .bottom-tab {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 56px;
+            padding-bottom: env(safe-area-inset-bottom);
+            background-color: #ffffff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        /* 单个tab项 */
+        .tab-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            gap: 2px;
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+        .tab-item.active .tab-icon {
+            color: #0084ff;
+        }
+        .tab-item.active .tab-text {
+            color: #0084ff;
         }
 
-        /* QQ企鹅图标 已替换为经典企鹅logo */
-        .qq-logo {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 24px;
-            /* 腾讯官方CDN企鹅图标，透明背景，稳定可访问 */
-            background: url("https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/qq_logo_100.png") no-repeat center;
-            background-size: contain;
+        /* tab图标 */
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            color: #666666;
+            position: relative;
+        }
+        /* 消息图标 */
+        .tab-icon.msg::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 4px;
+            top: 2px;
+            left: 2px;
+        }
+        .tab-icon.msg::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 2px solid currentColor;
+            border-top: none;
+            border-right: none;
+            border-radius: 2px;
+            bottom: 2px;
+            left: 8px;
+            transform: rotate(-45deg);
+            background-color: #ffffff;
+        }
+        /* 联系人图标 */
+        .tab-icon.contact::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            top: 2px;
+            left: 6px;
+        }
+        .tab-icon.contact::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            border: 2px solid currentColor;
+            border-radius: 10px 10px 0 0;
+            bottom: 2px;
+            left: 2px;
+        }
+        /* 动态图标 */
+        .tab-icon.dynamic::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+        .tab-icon.dynamic::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 2px;
+            background-color: currentColor;
+            border-radius: 1px;
+            top: 11px;
+            left: 8px;
+            transform: rotate(45deg);
+            box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
         }
 
-        /* 登录标题 */
-        .login-title {
-            font-size: 22px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 60px;
-        }
-
-        /* 核心进入按钮 仿QQ登录按钮样式 */
-        .enter-btn {
-            width: 100%;
-            max-width: 280px;
-            height: 48px;
-            background-color: #0084ff;
-            color: #fff;
-            border: none;
-            border-radius: 24px;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .enter-btn:hover {
-            background-color: #0077e6;
-        }
-
-        .enter-btn:active {
-            background-color: #0066cc;
-        }
-
-        .enter-btn:disabled {
-            background-color: #999;
-            cursor: not-allowed;
-        }
-
-        /* 底部版权文字 仿QQ登录页底部 */
-        .footer-text {
-            position: fixed;
-            bottom: 30px;
+        /* tab文字 */
+        .tab-text {
             font-size: 12px;
-            color: #999;
+            color: #666666;
         }
 
-        /* 恶搞提示 点击后显示 */
-        .prank-tip {
-            margin-top: 30px;
-            font-size: 16px;
-            color: #ff4444;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .prank-tip.show {
-            opacity: 1;
+        /* tab角标 */
+        .tab-badge {
+            position: absolute;
+            top: 0;
+            right: 6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            background-color: #ff4444;
+            color: #ffffff;
+            font-size: 11px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
-<body>
-    <!-- QQ企鹅logo -->
-    <div class="qq-logo"></div>
-    <!-- 登录标题 -->
-    <h1 class="login-title">QQ登录</h1>
-    <!-- 核心进入按钮 -->
-    <button class="enter-btn" id="enterBtn">进入</button>
-    <!-- 恶搞提示 -->
-    <div class="prank-tip" id="prankTip">恭喜你中招啦~</div>
-    <!-- 底部版权文字 -->
-    <div class="footer-text">腾讯公司 版权所有</div>
+<body id="qqPage">
+    <!-- 顶部头部 -->
+    <header class="qq-header">
+        <div class="header-user">
+            <!-- 左上角转圈加载头像 -->
+            <div class="loading-avatar"></div>
+            <div class="user-info">
+                <div class="user-name">东西路少</div>
+                <div class="user-status">
+                    <span class="status-dot"></span>
+                    <span>在线·睡觉中</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-add"></div>
+    </header>
 
-    <!-- 音频元素 O泡果奶魔性音乐 -->
-    <audio id="o泡Audio" preload="auto">
-        <!-- 音频链接可自行替换，当前为公开可访问的O泡果奶广告曲 -->
+    <!-- 搜索框 -->
+    <div class="search-bar">
+        <div class="search-icon"></div>
+        <span>搜索</span>
+    </div>
+
+    <!-- 网络不可用提示条 -->
+    <div class="network-tip">
+        <div class="network-left">
+            <div class="network-warning">!</div>
+            <div class="network-text">当前网络不可用，请检查网络设置。</div>
+        </div>
+        <div class="network-arrow"></div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div class="message-list">
+        <!-- 消息项1 -->
+        <div class="message-item">
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">14:55</div>
+        </div>
+
+        <!-- 消息项2 -->
+        <div class="message-item">
+            <div class="msg-badge">99+</div>
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">19:42</div>
+        </div>
+
+        <!-- 消息项3 -->
+        <div class="message-item">
+            <div class="msg-badge">1</div>
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">15:05</div>
+        </div>
+
+        <!-- 消息项4 -->
+        <div class="message-item">
+            <div class="msg-badge">1</div>
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">12:01</div>
+        </div>
+
+        <!-- 消息项5 -->
+        <div class="message-item">
+            <div class="msg-badge">1</div>
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">11:31</div>
+        </div>
+
+        <!-- 消息项6 -->
+        <div class="message-item">
+            <div class="msg-badge">1</div>
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">昨天 20:59</div>
+        </div>
+
+        <!-- 消息项7 -->
+        <div class="message-item">
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">昨天 19:44</div>
+        </div>
+
+        <!-- 消息项8 -->
+        <div class="message-item">
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">昨天 18:21</div>
+        </div>
+
+        <!-- 消息项9 -->
+        <div class="message-item">
+            <div class="loading-avatar"></div>
+            <div class="msg-content">
+                <div class="loading-line name"></div>
+                <div class="loading-line desc"></div>
+            </div>
+            <div class="msg-time">昨天 16:45</div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <nav class="bottom-tab">
+        <div class="tab-item active">
+            <div class="tab-icon msg"></div>
+            <div class="tab-text">消息</div>
+            <div class="tab-badge">3</div>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon contact"></div>
+            <div class="tab-text">联系人</div>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon dynamic"></div>
+            <div class="tab-text">动态</div>
+            <div class="tab-badge">1</div>
+        </div>
+    </nav>
+
+    <!-- O泡果奶音频元素 -->
+    <audio id="o泡Audio" preload="auto" loop>
         <source src="https://downsc.chinaz.net/Files/DownLoad/sound1/201907/11904.mp3" type="audio/mpeg">
     
 
     <script>
-        // 获取页面元素
-        const enterBtn = document.getElementById('enterBtn');
+        // 获取元素
+        const qqPage = document.getElementById('qqPage');
         const o泡Audio = document.getElementById('o泡Audio');
-        const prankTip = document.getElementById('prankTip');
+        // 标记是否已经触发播放，防止重复播放
+        let hasPlayed = false;
 
-        // 点击按钮触发恶搞效果
-        enterBtn.addEventListener('click', () => {
+        // 点击页面任意位置触发音频播放
+        qqPage.addEventListener('click', () => {
+            if (hasPlayed) return;
             // 网页音频音量拉满至100%最大值
             o泡Audio.volume = 1;
             // 播放魔性音频
             o泡Audio.play().catch(err => {
                 console.log('播放失败，请检查浏览器音频权限或音频链接', err);
-                alert('播放失败，请更换Chrome/Edge浏览器重试，或检查音频链接是否有效');
+                alert('播放失败，请更换Chrome/Edge/微信内置浏览器重试，或检查音频链接是否有效');
             });
-            // 显示中招提示
-            prankTip.classList.add('show');
-            // 禁用按钮防止重复点击
-            enterBtn.disabled = true;
+            // 标记已播放
+            hasPlayed = true;
         });
     </script>
 </body>
