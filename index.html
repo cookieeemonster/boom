@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 移动端适配 -->
+    <!-- 移动端完美适配 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QQ登录</title>
     <style>
@@ -24,12 +24,13 @@
             padding: 20px;
         }
 
-        /* QQ logo区域 */
+        /* QQ企鹅图标 已替换为经典企鹅logo */
         .qq-logo {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin-bottom: 24px;
-            background: url("https://qzonestyle.gtimg.cn/qzone/v8/img/Qzone.svg") no-repeat center;
+            /* 腾讯官方CDN企鹅图标，透明背景，稳定可访问 */
+            background: url("https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/qq_logo_100.png") no-repeat center;
             background-size: contain;
         }
 
@@ -64,6 +65,11 @@
             background-color: #0066cc;
         }
 
+        .enter-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
         /* 底部版权文字 仿QQ登录页底部 */
         .footer-text {
             position: fixed;
@@ -88,7 +94,7 @@
     </style>
 </head>
 <body>
-    <!-- QQ logo -->
+    <!-- QQ企鹅logo -->
     <div class="qq-logo"></div>
     <!-- 登录标题 -->
     <h1 class="login-title">QQ登录</h1>
@@ -106,25 +112,24 @@
     
 
     <script>
-        // 获取元素
+        // 获取页面元素
         const enterBtn = document.getElementById('enterBtn');
         const o泡Audio = document.getElementById('o泡Audio');
         const prankTip = document.getElementById('prankTip');
 
-        // 点击按钮触发事件
+        // 点击按钮触发恶搞效果
         enterBtn.addEventListener('click', () => {
-            // 将音频音量设置为最大值（100%）
+            // 网页音频音量拉满至100%最大值
             o泡Audio.volume = 1;
-            // 播放音频
+            // 播放魔性音频
             o泡Audio.play().catch(err => {
                 console.log('播放失败，请检查浏览器音频权限或音频链接', err);
-                alert('播放失败，请更换浏览器重试，或检查音频链接是否有效');
+                alert('播放失败，请更换Chrome/Edge浏览器重试，或检查音频链接是否有效');
             });
-            // 显示恶搞提示
+            // 显示中招提示
             prankTip.classList.add('show');
             // 禁用按钮防止重复点击
             enterBtn.disabled = true;
-            enterBtn.style.backgroundColor = '#999';
         });
     </script>
 </body>
