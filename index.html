@@ -477,6 +477,116 @@
             align-items: center;
             justify-content: center;
         }
+             /* ==================== 视频通话弹窗样式 ==================== */
+/* 弹窗容器 */
+#videoCallPopup {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94%;
+    max-width: 600px;
+    background: rgba(40, 40, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+/* 弹窗弹出动画 */
+#videoCallPopup.show {
+    top: 20px;
+    opacity: 1;
+}
+/* 弹窗左侧信息区 */
+.call-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+/* 头像样式 方图自动裁剪为圆角矩形 */
+.call-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+/* 通话文字信息 */
+.call-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+.call-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+}
+.call-desc {
+    font-size: 16px;
+    color: #cccccc;
+}
+/* 弹窗右侧按钮区 */
+.call-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+/* 通用按钮样式 */
+.call-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+/* 红色挂断按钮 */
+.hangup-btn {
+    background-color: #ff3b30;
+}
+.hangup-btn::after {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 2px;
+    transform: rotate(135deg);
+}
+/* 绿色接听按钮 */
+.answer-btn {
+    background-color: #34c759;
+}
+.answer-btn::after {
+    content: '';
+    width: 20px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 2px;
+    position: relative;
+}
+.answer-btn::before {
+    content: '';
+    width: 6px;
+    height: 8px;
+    border: 2px solid #ffffff;
+    border-left: none;
+    border-top: none;
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+}
     </style>
 </head>
 <body>
@@ -641,13 +751,43 @@
             </div>
         </nav>
     </div>
+    <!-- 自定义音频 替换src为你自己的音乐路径 -->
+    <audio id="callAudio" preload="auto">
+        <source src="这里替换成你自己的音乐文件路径.mp3" type="audio/mpeg">
+    
 
+    <!-- 视频通话弹窗 -->
+    <div id="videoCallPopup">
+        <div class="call-left">
+            <!-- 头像 替换src为你自己的图片路径 方图自动裁剪成圆角矩形 -->
+            <img src="这里替换成你自己的头像图片路径.jpg" class="call-avatar" alt="头像">
+            <div class="call-info">
+                <div class="call-name">陆湘香</div>
+                <div class="call-desc">邀请你视频通话</div>
+            </div>
+        </div>
+        <div class="call-right">
+            <button class="call-btn hangup-btn" id="hangupBtn"></button>
+            <button class="call-btn answer-btn" id="answerBtn"></button>
+        </div>
+    </div>
     <script>
-        // 获取所有页面元素
+               // 获取所有页面和元素
         const loginPage = document.getElementById('loginPage');
         const loadingPage = document.getElementById('loadingPage');
         const messagePage = document.getElementById('messagePage');
         const enterBtn = document.getElementById('enterBtn');
+        const videoCallPopup = document.getElementById('videoCallPopup');
+        const callAudio = document.getElementById('callAudio');
+        const hangupBtn = document.getElementById('hangupBtn');
+        const answerBtn = document.getElementById('answerBtn');
+
+        // 关闭弹窗+停止音乐的通用函数
+        function closeCallPopup() {
+            videoCallPopup.classList.remove('show');
+            callAudio.pause();
+            callAudio.currentTime = 0;
+        }
 
         // 点击登录页进入按钮，触发页面切换流程
         enterBtn.addEventListener('click', () => {
@@ -668,9 +808,24 @@
                     loadingPage.classList.add('hidden');
                     messagePage.classList.remove('hidden');
                     messagePage.classList.add('page-fade-in');
+
+                    // 4. 消息列表页显示后，延迟1秒弹出通话弹窗+播放音乐
+                    setTimeout(() => {
+                        videoCallPopup.classList.add('show');
+                        // 音乐音量拉满并播放
+                        callAudio.volume = 1;
+                        callAudio.play().catch(err => {
+                            console.log('音乐播放失败，请检查文件路径是否正确', err);
+                        });
+                    }, 1000);
+
                 }, 2000);
             }, 300);
         });
+
+        // 点击挂断/接听按钮，关闭弹窗+停止音乐
+        hangupBtn.addEventListener('click', closeCallPopup);
+        answerBtn.addEventListener('click', closeCallPopup);
     </script>
 </body>
 </html>
